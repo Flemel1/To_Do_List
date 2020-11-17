@@ -23,6 +23,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.internal.IdTokenListener;
+import com.google.firebase.internal.InternalTokenResult;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -78,8 +80,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 signIn();
                 break;
             case R.id.sign_out_button:
-                FirebaseAuth.getInstance().signOut();
-                updateUI(null);
+                mAuth.signOut();
+                mGoogleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        updateUI(null);
+                    }
+                });
                 break;
         }
     }
