@@ -65,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             signInButton.setVisibility(View.GONE);
             signOutButton.setVisibility(View.VISIBLE);
             Log.i("login", account.getDisplayName());
+            Intent intent = new Intent(MainActivity.this, HomepageActivity.class);
+            startActivity(intent);
         }
         else {
             signInButton.setVisibility(View.VISIBLE);
