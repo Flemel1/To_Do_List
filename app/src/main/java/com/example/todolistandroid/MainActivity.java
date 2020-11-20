@@ -28,7 +28,9 @@ import com.google.firebase.internal.InternalTokenResult;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final String TAG = "msg";
+    private final String TAG = "MainActivity";
+    private final String KEY_PHOTO_URL = "photo";
+
     private final int RC_SIGN_IN = 7;
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
@@ -64,9 +66,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(account != null) {
             signInButton.setVisibility(View.GONE);
             signOutButton.setVisibility(View.VISIBLE);
+            String photoUrl = account.getPhotoUrl().toString();
             Log.i("login", account.getDisplayName());
             Intent intent = new Intent(MainActivity.this, HomepageActivity.class);
+            intent.putExtra(KEY_PHOTO_URL, photoUrl);
             startActivity(intent);
+            finish();
         }
         else {
             signInButton.setVisibility(View.VISIBLE);

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">ToDoListAndroid</string>
+    <string name="my_schedule">My Schedule</string>
+    <string name="let_s_plan">Let\'s plan</string>
 </resources>

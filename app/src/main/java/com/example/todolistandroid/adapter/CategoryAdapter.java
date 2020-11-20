@@ -19,6 +19,12 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
     private Context context;
     private List<String> stringList = new ArrayList<>();
+    private int[] idImage = new int[]{R.drawable.ic_baseline_sports_volleyball_24,
+                                        R.drawable.ic_kategori_pekerjaan,
+                                        R.drawable.ic_kaategori_acara,
+                                        R.drawable.ic_kategori_makan,
+                                        R.drawable.ic_kategori_meeting,
+                                        R.drawable.ic_kategori_rekreasi};
 
     public CategoryAdapter(Context context, List<String> stringList) {
         this.context = context;
@@ -34,7 +40,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull CategoryAdapter.ViewHolder holder, int position) {
-        holder.image.setImageResource(R.drawable.ic_launcher_background);
+        holder.image.setImageResource(idImage[position]);
         holder.txt_category_name.setText(stringList.get(position));
         holder.txt_item_sum.setText("0 items");
     }
