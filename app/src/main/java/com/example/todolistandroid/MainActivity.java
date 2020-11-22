@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private SignInButton signInButton;
-    private Button signOutButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,38 +40,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mAuth = FirebaseAuth.getInstance();
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         signInButton = findViewById(R.id.sign_in_button);
-        signOutButton = findViewById(R.id.sign_out_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
         signInButton.setOnClickListener(this);
-        signOutButton.setOnClickListener(this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        GoogleSignInAccount currentUser = GoogleSignIn.getLastSignedInAccount(this);
+        FirebaseUser currentUser = mAuth.getCurrentUser();
         updateUI(currentUser);
     }
 
-    private void updateUI(GoogleSignInAccount account) {
+    private void updateUI(FirebaseUser account) {
         if(account != null) {
             signInButton.setVisibility(View.GONE);
-            signOutButton.setVisibility(View.VISIBLE);
-//            String photoUrl = account.getPhotoUrl().toString();
+            String photoUrl = account.getPhotoUrl().toString();
             Log.i("login", account.getDisplayName());
             Intent intent = new Intent(MainActivity.this, HomepageActivity.class);
-//            intent.putExtra(KEY_PHOTO_URL, photoUrl);
+            intent.putExtra(KEY_PHOTO_URL, photoUrl);
             startActivity(intent);
             finish();
-        }
-        else {
-            signInButton.setVisibility(View.VISIBLE);
-            signOutButton.setVisibility(View.GONE);
-            Log.i("logout","logout");
         }
     }
 
@@ -81,15 +73,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.sign_in_button:
                 signIn();
-                break;
-            case R.id.sign_out_button:
-                mAuth.signOut();
-                mGoogleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        updateUI(null);
-                    }
-                });
                 break;
         }
     }
@@ -111,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 Log.d(TAG, "firebaseAuthWithGoogle:" + account.getId());
                 GoogleSignInAccount user = GoogleSignIn.getLastSignedInAccount(this);
-                updateUI(user);
+                firebaseAuthWithGoogle(user.getIdToken());
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e);
@@ -129,7 +112,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
-
+                            FirebaseUser account = mAuth.getCurrentUser();
+                            updateUI(account);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
