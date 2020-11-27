@@ -51,9 +51,15 @@ public class HomepageActivity extends AppCompatActivity {
         mBinding.btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+//                addTask();
                 Toast.makeText(getApplicationContext(), "Tombol berhasil", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void addTask(){
+        Intent taskintent = new Intent(this, AddTaskActivity.class);
+        startActivity(taskintent);
     }
 
     private void addTaskToList() {
@@ -79,6 +85,8 @@ public class HomepageActivity extends AppCompatActivity {
         stringList.add("Meeting");
         stringList.add("Rekreasi");
     }
+
+
 
 
 }
