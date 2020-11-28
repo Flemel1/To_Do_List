@@ -13,6 +13,8 @@ import com.example.todolistandroid.adapter.CategoryAdapter;
 import com.example.todolistandroid.adapter.TaskAdapter;
 import com.example.todolistandroid.databinding.ActivityHomepageBinding;
 import com.example.todolistandroid.model.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,14 +31,19 @@ public class HomepageActivity extends AppCompatActivity {
     private List<String> stringList;
     private List<Task> tasks;
     private Intent myIntent;
+    private FirebaseAuth mAuth;
+    private FirebaseUser currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
         mBinding = ActivityHomepageBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
         myIntent = getIntent();
-        Glide.with(this).load(myIntent.getStringExtra(KEY_PHOTO_URL)).into(mBinding.imgProfile);
+//        Glide.with(this).load(myIntent.getStringExtra(KEY_PHOTO_URL)).into(mBinding.imgProfile);
+        Glide.with(this).load(currentUser.getPhotoUrl()).into(mBinding.imgProfile);
         addItemToList();
         addTaskToList();
         mLinearLayoutManager = new LinearLayoutManager(HomepageActivity.this,
@@ -51,7 +58,7 @@ public class HomepageActivity extends AppCompatActivity {
         mBinding.btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                addTask();
+                addTask();
                 Toast.makeText(getApplicationContext(), "Tombol berhasil", Toast.LENGTH_SHORT).show();
             }
         });
@@ -85,8 +92,5 @@ public class HomepageActivity extends AppCompatActivity {
         stringList.add("Meeting");
         stringList.add("Rekreasi");
     }
-
-
-
 
 }
