@@ -45,6 +45,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     public void onBindViewHolder(@NonNull CategoryAdapter.ViewHolder holder, int position) {
         holder.image.setImageResource(idImage[position]);
         holder.txt_category_name.setText(stringList.get(position));
+        // mengisi jumlah item pada setiap kategori
         if (position == 0) {
             holder.txt_item_sum.setText(myTask.getTotalKatergoriOlahraga() + " Item");
         }

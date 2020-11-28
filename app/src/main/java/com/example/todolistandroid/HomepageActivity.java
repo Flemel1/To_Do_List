@@ -7,6 +7,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -15,6 +18,9 @@ import com.example.todolistandroid.adapter.CategoryAdapter;
 import com.example.todolistandroid.adapter.TaskAdapter;
 import com.example.todolistandroid.databinding.ActivityHomepageBinding;
 import com.example.todolistandroid.model.Task;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -63,9 +69,10 @@ public class HomepageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addTask();
-                Toast.makeText(getApplicationContext(), "Tombol berhasil", Toast.LENGTH_SHORT).show();
             }
         });
+        //register context menu untuk logout dengan menekan lama gambar profile
+        registerForContextMenu(mBinding.imgProfile);
     }
 
 
@@ -85,6 +92,7 @@ public class HomepageActivity extends AppCompatActivity {
                         Task totalKategoriKegiatanTiapUser = new Task();
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
+                                // mengambil data dari firebase berdasarkan akun yang login
                                 Task myTask = new Task();
                                 Log.d(TAG, document.getId() + " => " + document.getData());
                                 myTask.setUid(document.getId());
@@ -93,6 +101,7 @@ public class HomepageActivity extends AppCompatActivity {
                                 myTask.setWaktu(document.get("waktu").toString());
                                 myTask.setDeskripsi(document.get("desc").toString());
                                 myTask.setKategori(document.get("kategori").toString());
+                                // menghitung total item pada setiap kategori dan dimasukan kedalam object totalKategoriKegiatanTiapUser
                                 if (document.get("kategori").toString().equalsIgnoreCase("olahraga")) {
                                     totalKategoriKegiatanTiapUser.setTotalKatergoriOlahraga(1);
                                 }
@@ -136,6 +145,35 @@ public class HomepageActivity extends AppCompatActivity {
         stringList.add("Rekreasi");
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_item, menu);
+    }
 
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        Intent intent = new Intent(this, MainActivity.class);
+        logout();
+        startActivity(intent);
+        finish();
+        return true;
+    }
 
+    // fungsi logout
+    private void logout() {
+        mAuth.signOut();
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        mGoogleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+                Toast.makeText(getApplicationContext(), "Logout berhasil", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 }
