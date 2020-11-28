@@ -2,4 +2,12 @@
     <string name="app_name">ToDoListAndroid</string>
     <string name="my_schedule">My Schedule</string>
     <string name="let_s_plan">Let\'s plan</string>
+    <string-array name="category_array">
+        <item>Olahraga</item>
+        <item>Pekerjaan</item>
+        <item>Acara</item>
+        <item>Makan</item>
+        <item>Meeting</item>
+        <item>Rekreasi</item>
+    </string-array>
 </resources>

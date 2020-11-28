@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AddTaskActivity">
+    tools:context=".AddTaskActivity"
+    tools:visibility="visible">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,10 +16,10 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp">
+            android:layout_height="wrap_content">
 
             <ImageView
-                android:layout_width="23dp"
+                android:layout_width="42dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.75"
                 android:paddingLeft="20dp"
@@ -45,89 +45,115 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp">
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.75"
-            android:src="@drawable/ic_kaategori_acara"
-            android:paddingLeft="20dp"
-            android:paddingTop="20dp"
-            android:paddingRight="20dp"/>
-        <EditText
-            android:id="@+id/txtAddTime"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.25"
-            android:text="Waktu"
-            android:paddingLeft="20dp"
-            android:paddingTop="20dp"
-            android:paddingRight="20dp"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="100dp">
+            android:layout_height="wrap_content">
 
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="0.75"
-                android:src="@drawable/ic_kaategori_acara"
                 android:paddingLeft="20dp"
                 android:paddingTop="20dp"
-                android:paddingRight="20dp"/>
+                android:paddingRight="20dp"
+                android:src="@drawable/ic_kaategori_acara" />
+
+            <EditText
+                android:id="@+id/txtAddTitle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.25"
+                android:hint="Title"
+                android:paddingLeft="20dp"
+                android:paddingTop="20dp"
+                android:paddingRight="20dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.75"
+                android:paddingLeft="20dp"
+                android:paddingTop="20dp"
+                android:paddingRight="20dp"
+                android:src="@drawable/ic_kaategori_acara" />
+
+            <EditText
+                android:id="@+id/txtAddWaktu"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.25"
+                android:paddingLeft="20dp"
+                android:paddingTop="20dp"
+                android:paddingRight="20dp"
+                android:text="Waktu" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.75"
+                android:paddingLeft="20dp"
+                android:paddingTop="20dp"
+                android:paddingRight="20dp"
+                android:src="@drawable/ic_kaategori_acara" />
+
             <EditText
                 android:id="@+id/txtAddReminder"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="0.25"
-                android:text="Reminder"
                 android:paddingLeft="20dp"
                 android:paddingTop="20dp"
-                android:paddingRight="20dp"/>
+                android:paddingRight="20dp"
+                android:text="Reminder" />
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp">
+            android:layout_height="54dp">
 
             <ImageView
-                android:layout_width="match_parent"
+                android:layout_width="206dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.75"
-                android:src="@drawable/ic_kaategori_acara"
                 android:paddingLeft="20dp"
                 android:paddingTop="20dp"
-                android:paddingRight="20dp"/>
-            <EditText
-                android:id="@+id/txtAddCategory"
+                android:paddingRight="20dp"
+                android:src="@drawable/ic_kaategori_acara" />
+
+            <Spinner
+                android:id="@+id/spinnerCategory"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.25"
-                android:text="Category"
-                android:paddingLeft="20dp"
-                android:paddingTop="20dp"
-                android:paddingRight="20dp"/>
+                android:layout_height="45dp"
+                android:layout_weight="0.75"
+                android:visibility="visible" />
         </LinearLayout>
 
         <EditText
             android:id="@+id/txtAddTask"
-            android:paddingTop="20dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:paddingBottom="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@null"
             android:gravity="top|left"
+            android:hint="Write Your Task Here"
             android:inputType="textMultiLine"
+            android:lines="6"
             android:overScrollMode="always"
+            android:paddingLeft="20dp"
+            android:paddingTop="20dp"
+            android:paddingRight="20dp"
+            android:paddingBottom="20dp"
             android:scrollbarStyle="insideInset"
             android:scrollbars="vertical"
-            android:lines="6"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:hint="Write Your Task Here"
-            android:scrollHorizontally="false" />
+            android:scrollHorizontally="false"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <LinearLayout
             android:layout_width="match_parent"

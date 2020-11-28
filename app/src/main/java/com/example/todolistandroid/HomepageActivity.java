@@ -1,10 +1,12 @@
 package com.example.todolistandroid;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -13,14 +15,20 @@ import com.example.todolistandroid.adapter.CategoryAdapter;
 import com.example.todolistandroid.adapter.TaskAdapter;
 import com.example.todolistandroid.databinding.ActivityHomepageBinding;
 import com.example.todolistandroid.model.Task;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class HomepageActivity extends AppCompatActivity {
-
+    private static final String TAG = "HomepageActivity";
     private final String KEY_PHOTO_URL = "photo";
 
     private ActivityHomepageBinding mBinding;
@@ -33,6 +41,7 @@ public class HomepageActivity extends AppCompatActivity {
     private Intent myIntent;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +51,6 @@ public class HomepageActivity extends AppCompatActivity {
         mBinding = ActivityHomepageBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
         myIntent = getIntent();
-//        Glide.with(this).load(myIntent.getStringExtra(KEY_PHOTO_URL)).into(mBinding.imgProfile);
         Glide.with(this).load(currentUser.getPhotoUrl()).into(mBinding.imgProfile);
         addItemToList();
         addTaskToList();
@@ -64,6 +72,7 @@ public class HomepageActivity extends AppCompatActivity {
         });
     }
 
+
     private void addTask(){
         Intent taskintent = new Intent(this, AddTaskActivity.class);
         startActivity(taskintent);
@@ -71,16 +80,23 @@ public class HomepageActivity extends AppCompatActivity {
 
     private void addTaskToList() {
         tasks = new ArrayList<>();
-        Task task1 = new Task();
-        Task task2 = new Task();
-        task1.setTanggal("30");
-        task1.setNamaTask("Mandi");
-        task1.setWaktu("13:30");
-        task2.setTanggal("31");
-        task2.setNamaTask("Makan");
-        task2.setWaktu("09:30");
-        tasks.add(task1);
-        tasks.add(task2);
+//        Bagian READ data dari firestore maish salah :(
+        db.collection("Tasks")
+                .whereEqualTo("uid", currentUser.getUid())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                tasks.add(new Task(document.get("judul").toString(), document.get("tanggal").toString(), document.get("waktu").toString()));
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
     }
 
     private void addItemToList() {
