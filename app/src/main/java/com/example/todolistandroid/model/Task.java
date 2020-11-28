@@ -6,6 +6,13 @@ public class Task {
     private String waktu;
     private String kategori;
     private String deskripsi;
+    private String uid;
+    private int totalKatergoriOlahraga = 0;
+    private int totalKatergoriPekerjaan = 0;
+    private int totalKatergoriAcara = 0;
+    private int totalKatergoriMakan = 0;
+    private int totalKatergoriMeeting = 0;
+    private int totalKatergoriRekreasi = 0;
 
     public Task(){
 
@@ -55,5 +62,61 @@ public class Task {
 
     public void setDeskripsi(String deskripsi) {
         this.deskripsi = deskripsi;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public int getTotalKatergoriOlahraga() {
+        return totalKatergoriOlahraga;
+    }
+
+    public void setTotalKatergoriOlahraga(int totalKatergoriOlahraga) {
+        this.totalKatergoriOlahraga += totalKatergoriOlahraga;
+    }
+
+    public int getTotalKatergoriPekerjaan() {
+        return totalKatergoriPekerjaan;
+    }
+
+    public void setTotalKatergoriPekerjaan(int totalKatergoriPekerjaan) {
+        this.totalKatergoriPekerjaan += totalKatergoriPekerjaan;
+    }
+
+    public int getTotalKatergoriAcara() {
+        return totalKatergoriAcara;
+    }
+
+    public void setTotalKatergoriAcara(int totalKatergoriAcara) {
+        this.totalKatergoriAcara += totalKatergoriAcara;
+    }
+
+    public int getTotalKatergoriMakan() {
+        return totalKatergoriMakan;
+    }
+
+    public void setTotalKatergoriMakan(int totalKatergoriMakan) {
+        this.totalKatergoriMakan += totalKatergoriMakan;
+    }
+
+    public int getTotalKatergoriMeeting() {
+        return totalKatergoriMeeting;
+    }
+
+    public void setTotalKatergoriMeeting(int totalKatergoriMeeting) {
+        this.totalKatergoriMeeting += totalKatergoriMeeting;
+    }
+
+    public int getTotalKatergoriRekreasi() {
+        return totalKatergoriRekreasi;
+    }
+
+    public void setTotalKatergoriRekreasi(int totalKatergoriRekreasi) {
+        this.totalKatergoriRekreasi += totalKatergoriRekreasi;
     }
 }

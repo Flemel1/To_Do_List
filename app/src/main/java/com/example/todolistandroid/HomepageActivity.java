@@ -37,7 +37,7 @@ public class HomepageActivity extends AppCompatActivity {
     private CategoryAdapter categoryAdapter;
     private TaskAdapter taskAdapter;
     private List<String> stringList;
-    private List<Task> tasks;
+    List<Task> tasks;
     private Intent myIntent;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
@@ -59,10 +59,6 @@ public class HomepageActivity extends AppCompatActivity {
         mLinearLayoutManagerTask = new LinearLayoutManager(HomepageActivity.this);
         mBinding.rcCatergory.setLayoutManager(mLinearLayoutManager);
         mBinding.rcTask.setLayoutManager(mLinearLayoutManagerTask);
-        categoryAdapter = new CategoryAdapter(this, stringList);
-        taskAdapter = new TaskAdapter(this, tasks);
-        mBinding.rcCatergory.setAdapter(categoryAdapter);
-        mBinding.rcTask.setAdapter(taskAdapter);
         mBinding.btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -80,23 +76,54 @@ public class HomepageActivity extends AppCompatActivity {
 
     private void addTaskToList() {
         tasks = new ArrayList<>();
-//        Bagian READ data dari firestore maish salah :(
         db.collection("Tasks")
                 .whereEqualTo("uid", currentUser.getUid())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull com.google.android.gms.tasks.Task<QuerySnapshot> task) {
+                        Task totalKategoriKegiatanTiapUser = new Task();
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
+                                Task myTask = new Task();
                                 Log.d(TAG, document.getId() + " => " + document.getData());
-                                tasks.add(new Task(document.get("judul").toString(), document.get("tanggal").toString(), document.get("waktu").toString()));
+                                myTask.setUid(document.getId());
+                                myTask.setNamaTask(document.get("judul").toString());
+                                myTask.setTanggal(document.get("tanggal").toString());
+                                myTask.setWaktu(document.get("waktu").toString());
+                                myTask.setDeskripsi(document.get("desc").toString());
+                                myTask.setKategori(document.get("kategori").toString());
+                                if (document.get("kategori").toString().equalsIgnoreCase("olahraga")) {
+                                    totalKategoriKegiatanTiapUser.setTotalKatergoriOlahraga(1);
+                                }
+                                else if(document.get("kategori").toString().equalsIgnoreCase("pekerjaan")) {
+                                    totalKategoriKegiatanTiapUser.setTotalKatergoriPekerjaan(1);
+                                }
+                                else if(document.get("kategori").toString().equalsIgnoreCase("acara")) {
+                                    totalKategoriKegiatanTiapUser.setTotalKatergoriAcara(1);
+                                }
+                                else if(document.get("kategori").toString().equalsIgnoreCase("makan")) {
+                                    totalKategoriKegiatanTiapUser.setTotalKatergoriMakan(1);
+                                }
+                                else if(document.get("kategori").toString().equalsIgnoreCase("meeting")) {
+                                    totalKategoriKegiatanTiapUser.setTotalKatergoriMeeting(1);
+                                }
+                                else if(document.get("kategori").toString().equalsIgnoreCase("rekreasi")) {
+                                    totalKategoriKegiatanTiapUser.setTotalKatergoriRekreasi(1);
+                                }
+                                tasks.add(myTask);
                             }
+                            taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
+                            categoryAdapter = new CategoryAdapter(getApplicationContext(), stringList, totalKategoriKegiatanTiapUser);
+                            mBinding.rcTask.setAdapter(taskAdapter);
+
+                            mBinding.rcCatergory.setAdapter(categoryAdapter);
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
                         }
                     }
                 });
+
     }
 
     private void addItemToList() {
@@ -108,5 +135,7 @@ public class HomepageActivity extends AppCompatActivity {
         stringList.add("Meeting");
         stringList.add("Rekreasi");
     }
+
+
 
 }

@@ -1,6 +1,7 @@
 package com.example.todolistandroid;
 
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,8 +29,11 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.text.DateFormat;
 
-public class AddTaskActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener,AdapterView.OnItemSelectedListener{
+public class AddTaskActivity extends AppCompatActivity implements
+        DatePickerDialog.OnDateSetListener,AdapterView.OnItemSelectedListener,
+        TimePickerDialog.OnTimeSetListener {
 
     private ActivityAddtaskBinding mBinding;
     private static final String TAG = "AddTaskActivity";
@@ -39,6 +44,7 @@ public class AddTaskActivity extends AppCompatActivity implements DatePickerDial
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private Calendar calendar = Calendar.getInstance();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,6 +56,10 @@ public class AddTaskActivity extends AppCompatActivity implements DatePickerDial
         mBinding.btnDate.setOnClickListener(v -> {
             DialogFragment datePicker = new DatePickerFragment();
             datePicker.show(getSupportFragmentManager(), "date picker");
+        });
+        mBinding.txtAddWaktu.setOnClickListener(v -> {
+            DialogFragment timePicker = new TimePickerFragment();
+            timePicker.show(getSupportFragmentManager(), "time picker");
         });
         mBinding.btnCancel.setOnClickListener(view -> cancel());
         mBinding.btnSave.setOnClickListener(view ->save());
@@ -90,6 +100,7 @@ public class AddTaskActivity extends AppCompatActivity implements DatePickerDial
         task.put("waktu",waktu);
         task.put("reminder",reminder);
         task.put("desc",desc);
+        task.put("kategori", currentCategory);
 
         db.collection("Tasks").add(task)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -108,6 +119,7 @@ public class AddTaskActivity extends AppCompatActivity implements DatePickerDial
 //        Move to Homepage Activity
         Intent intent = new Intent(this, HomepageActivity.class);
         startActivity(intent);
+        finish();
     }
 
     @Override
@@ -119,5 +131,14 @@ public class AddTaskActivity extends AppCompatActivity implements DatePickerDial
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
 
+    }
+
+    @Override
+    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.SECOND, 0);
+        String textTime = DateFormat.getTimeInstance(DateFormat.SHORT).format(calendar.getTime());
+        mBinding.txtAddWaktu.setText(textTime);
     }
 }

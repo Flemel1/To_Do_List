@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.todolistandroid.R;
+import com.example.todolistandroid.model.Task;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
     private Context context;
     private List<String> stringList = new ArrayList<>();
+    private Task myTask;
     private int[] idImage = new int[]{R.drawable.ic_baseline_sports_volleyball_24,
                                         R.drawable.ic_kategori_pekerjaan,
                                         R.drawable.ic_kaategori_acara,
@@ -26,9 +28,10 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
                                         R.drawable.ic_kategori_meeting,
                                         R.drawable.ic_kategori_rekreasi};
 
-    public CategoryAdapter(Context context, List<String> stringList) {
+    public CategoryAdapter(Context context, List<String> stringList, Task myTask) {
         this.context = context;
         this.stringList = stringList;
+        this.myTask = myTask;
     }
 
     @NonNull
@@ -42,7 +45,24 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     public void onBindViewHolder(@NonNull CategoryAdapter.ViewHolder holder, int position) {
         holder.image.setImageResource(idImage[position]);
         holder.txt_category_name.setText(stringList.get(position));
-        holder.txt_item_sum.setText("0 items");
+        if (position == 0) {
+            holder.txt_item_sum.setText(myTask.getTotalKatergoriOlahraga() + " Item");
+        }
+        else if (position == 1) {
+            holder.txt_item_sum.setText(myTask.getTotalKatergoriPekerjaan() + " Item");
+        }
+        else if (position == 2) {
+            holder.txt_item_sum.setText(myTask.getTotalKatergoriAcara() + " Item");
+        }
+        else if (position == 3) {
+            holder.txt_item_sum.setText(myTask.getTotalKatergoriMakan() + " Item");
+        }
+        else if (position == 4) {
+            holder.txt_item_sum.setText(myTask.getTotalKatergoriMeeting() + " Item");
+        }
+        else if (position == 5) {
+            holder.txt_item_sum.setText(myTask.getTotalKatergoriPekerjaan() + " Item");
+        }
     }
 
     @Override
