@@ -1,9 +1,5 @@
 package com.example.todolistandroid;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,7 +7,12 @@ import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.SearchView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
 import com.example.todolistandroid.adapter.CategoryAdapter;
@@ -22,10 +23,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -71,6 +70,30 @@ public class HomepageActivity extends AppCompatActivity {
                 addTask();
             }
         });
+        //Searching yang dicari harus datanya masih harus sama persis misal Lari harus Lari baru muncul
+        //belum bisa per karakter
+        mBinding.editText.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                Log.d(TAG, "Searching:"+s);
+                searchList(s);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                Log.d(TAG, "Search:"+s);
+                searchList(s);
+                return false;
+            }
+        });
+        mBinding.editText.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                addTaskToList();
+                return false;
+            }
+        });
         //register context menu untuk logout dengan menekan lama gambar profile
         registerForContextMenu(mBinding.imgProfile);
     }
@@ -101,6 +124,62 @@ public class HomepageActivity extends AppCompatActivity {
                                 myTask.setWaktu(document.get("waktu").toString());
                                 myTask.setDeskripsi(document.get("desc").toString());
                                 myTask.setKategori(document.get("kategori").toString());
+                                // menghitung total item pada setiap kategori dan dimasukan kedalam object totalKategoriKegiatanTiapUser
+                                if (document.get("kategori").toString().equalsIgnoreCase("olahraga")) {
+                                    totalKategoriKegiatanTiapUser.setTotalKatergoriOlahraga(1);
+                                }
+                                else if(document.get("kategori").toString().equalsIgnoreCase("pekerjaan")) {
+                                    totalKategoriKegiatanTiapUser.setTotalKatergoriPekerjaan(1);
+                                }
+                                else if(document.get("kategori").toString().equalsIgnoreCase("acara")) {
+                                    totalKategoriKegiatanTiapUser.setTotalKatergoriAcara(1);
+                                }
+                                else if(document.get("kategori").toString().equalsIgnoreCase("makan")) {
+                                    totalKategoriKegiatanTiapUser.setTotalKatergoriMakan(1);
+                                }
+                                else if(document.get("kategori").toString().equalsIgnoreCase("meeting")) {
+                                    totalKategoriKegiatanTiapUser.setTotalKatergoriMeeting(1);
+                                }
+                                else if(document.get("kategori").toString().equalsIgnoreCase("rekreasi")) {
+                                    totalKategoriKegiatanTiapUser.setTotalKatergoriRekreasi(1);
+                                }
+                                tasks.add(myTask);
+                            }
+                            taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
+                            categoryAdapter = new CategoryAdapter(getApplicationContext(), stringList, totalKategoriKegiatanTiapUser);
+                            mBinding.rcTask.setAdapter(taskAdapter);
+
+                            mBinding.rcCatergory.setAdapter(categoryAdapter);
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+
+    }
+
+    private void searchList(String s) {
+        tasks = new ArrayList<>();
+        db.collection("Tasks")
+                .whereEqualTo("uid", currentUser.getUid())
+                .whereEqualTo("judul", s)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<QuerySnapshot> task) {
+                        Task totalKategoriKegiatanTiapUser = new Task();
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                // mengambil data dari firebase berdasarkan akun yang login dan judul yang disearch
+                                Task myTask = new Task();
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                myTask.setUid(currentUser.getUid());
+                                myTask.setNamaTask(document.get("judul").toString());
+                                myTask.setTanggal(document.get("tanggal").toString());
+                                myTask.setWaktu(document.get("waktu").toString());
+                                myTask.setDeskripsi(document.get("desc").toString());
+                                myTask.setKategori(document.get("kategori").toString());
+                                myTask.setDocumentID(document.getId());
                                 // menghitung total item pada setiap kategori dan dimasukan kedalam object totalKategoriKegiatanTiapUser
                                 if (document.get("kategori").toString().equalsIgnoreCase("olahraga")) {
                                     totalKategoriKegiatanTiapUser.setTotalKatergoriOlahraga(1);

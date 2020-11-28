@@ -7,6 +7,8 @@ public class Task {
     private String kategori;
     private String deskripsi;
     private String uid;
+    private String documentID;
+
     private int totalKatergoriOlahraga = 0;
     private int totalKatergoriPekerjaan = 0;
     private int totalKatergoriAcara = 0;
@@ -70,6 +72,14 @@ public class Task {
 
     public void setUid(String uid) {
         this.uid = uid;
+    }
+
+    public String getDocumentID() {
+        return documentID;
+    }
+
+    public void setDocumentID(String documentID) {
+        this.documentID = documentID;
     }
 
     public int getTotalKatergoriOlahraga() {
