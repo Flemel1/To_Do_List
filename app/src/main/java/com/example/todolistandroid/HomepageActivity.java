@@ -43,6 +43,7 @@ public class HomepageActivity extends AppCompatActivity {
     private TaskAdapter taskAdapter;
     private List<String> stringList;
     List<Task> tasks;
+    List<Task> searchTasks;
     private Intent myIntent;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
@@ -76,14 +77,14 @@ public class HomepageActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String s) {
                 Log.d(TAG, "Searching:"+s);
-                searchList(s);
+                searchList(s.toLowerCase());
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String s) {
                 Log.d(TAG, "Search:"+s);
-                searchList(s);
+                searchList(s.toLowerCase());
                 return false;
             }
         });
@@ -155,14 +156,12 @@ public class HomepageActivity extends AppCompatActivity {
                         }
                     }
                 });
-
     }
-
-    private void searchList(String s) {
-        tasks = new ArrayList<>();
+    //fungsi searching
+    private void searchList(String search) {
+        searchTasks = new ArrayList<>();
         db.collection("Tasks")
                 .whereEqualTo("uid", currentUser.getUid())
-                .whereEqualTo("judul", s)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -171,47 +170,43 @@ public class HomepageActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 // mengambil data dari firebase berdasarkan akun yang login dan judul yang disearch
-                                Task myTask = new Task();
-                                Log.d(TAG, document.getId() + " => " + document.getData());
-                                myTask.setUid(currentUser.getUid());
-                                myTask.setNamaTask(document.get("judul").toString());
-                                myTask.setTanggal(document.get("tanggal").toString());
-                                myTask.setWaktu(document.get("waktu").toString());
-                                myTask.setDeskripsi(document.get("desc").toString());
-                                myTask.setKategori(document.get("kategori").toString());
-                                myTask.setDocumentID(document.getId());
-                                // menghitung total item pada setiap kategori dan dimasukan kedalam object totalKategoriKegiatanTiapUser
-                                if (document.get("kategori").toString().equalsIgnoreCase("olahraga")) {
-                                    totalKategoriKegiatanTiapUser.setTotalKatergoriOlahraga(1);
+                                String dataSearch = document.get("judul").toString().toLowerCase();
+                                if(dataSearch.contains(search) || dataSearch.startsWith(search)) {
+                                    Task myTask = new Task();
+                                    Log.d(TAG, document.getId() + " => " + document.getData());
+                                    myTask.setUid(currentUser.getUid());
+                                    myTask.setNamaTask(document.get("judul").toString());
+                                    myTask.setTanggal(document.get("tanggal").toString());
+                                    myTask.setWaktu(document.get("waktu").toString());
+                                    myTask.setDeskripsi(document.get("desc").toString());
+                                    myTask.setKategori(document.get("kategori").toString());
+                                    myTask.setDocumentID(document.getId());
+                                    // menghitung total item pada setiap kategori dan dimasukan kedalam object totalKategoriKegiatanTiapUser
+                                    if (document.get("kategori").toString().equalsIgnoreCase("olahraga")) {
+                                        totalKategoriKegiatanTiapUser.setTotalKatergoriOlahraga(1);
+                                    } else if (document.get("kategori").toString().equalsIgnoreCase("pekerjaan")) {
+                                        totalKategoriKegiatanTiapUser.setTotalKatergoriPekerjaan(1);
+                                    } else if (document.get("kategori").toString().equalsIgnoreCase("acara")) {
+                                        totalKategoriKegiatanTiapUser.setTotalKatergoriAcara(1);
+                                    } else if (document.get("kategori").toString().equalsIgnoreCase("makan")) {
+                                        totalKategoriKegiatanTiapUser.setTotalKatergoriMakan(1);
+                                    } else if (document.get("kategori").toString().equalsIgnoreCase("meeting")) {
+                                        totalKategoriKegiatanTiapUser.setTotalKatergoriMeeting(1);
+                                    } else if (document.get("kategori").toString().equalsIgnoreCase("rekreasi")) {
+                                        totalKategoriKegiatanTiapUser.setTotalKatergoriRekreasi(1);
+                                    }
+                                    searchTasks.add(myTask);
                                 }
-                                else if(document.get("kategori").toString().equalsIgnoreCase("pekerjaan")) {
-                                    totalKategoriKegiatanTiapUser.setTotalKatergoriPekerjaan(1);
-                                }
-                                else if(document.get("kategori").toString().equalsIgnoreCase("acara")) {
-                                    totalKategoriKegiatanTiapUser.setTotalKatergoriAcara(1);
-                                }
-                                else if(document.get("kategori").toString().equalsIgnoreCase("makan")) {
-                                    totalKategoriKegiatanTiapUser.setTotalKatergoriMakan(1);
-                                }
-                                else if(document.get("kategori").toString().equalsIgnoreCase("meeting")) {
-                                    totalKategoriKegiatanTiapUser.setTotalKatergoriMeeting(1);
-                                }
-                                else if(document.get("kategori").toString().equalsIgnoreCase("rekreasi")) {
-                                    totalKategoriKegiatanTiapUser.setTotalKatergoriRekreasi(1);
-                                }
-                                tasks.add(myTask);
                             }
-                            taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
+                            taskAdapter = new TaskAdapter(getApplicationContext(), searchTasks);
                             categoryAdapter = new CategoryAdapter(getApplicationContext(), stringList, totalKategoriKegiatanTiapUser);
                             mBinding.rcTask.setAdapter(taskAdapter);
-
                             mBinding.rcCatergory.setAdapter(categoryAdapter);
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
                         }
                     }
                 });
-
     }
 
     private void addItemToList() {
