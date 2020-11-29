@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
@@ -62,15 +63,15 @@ public class HomepageActivity extends AppCompatActivity {
         addTaskToList();
         mLinearLayoutManager = new LinearLayoutManager(HomepageActivity.this,
                 LinearLayoutManager.HORIZONTAL, false);
-        mLinearLayoutManagerTask = new LinearLayoutManager(HomepageActivity.this);
+        mLinearLayoutManagerTask = new LinearLayoutManager(HomepageActivity.this,LinearLayoutManager.VERTICAL, false);
         mBinding.rcCatergory.setLayoutManager(mLinearLayoutManager);
         mBinding.rcTask.setLayoutManager(mLinearLayoutManagerTask);
-        mBinding.btnAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addTask();
-            }
-        });
+
+        SwipeController swipeController = new SwipeController();
+        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeController);
+        itemTouchhelper.attachToRecyclerView(mBinding.rcTask);
+
+        mBinding.btnAdd.setOnClickListener(v -> addTask());
         //Searching yang dicari harus datanya masih harus sama persis misal Lari harus Lari baru muncul
         //belum bisa per karakter
         mBinding.editText.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -88,12 +89,9 @@ public class HomepageActivity extends AppCompatActivity {
                 return false;
             }
         });
-        mBinding.editText.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                addTaskToList();
-                return false;
-            }
+        mBinding.editText.setOnCloseListener(() -> {
+            addTaskToList();
+            return false;
         });
         //register context menu untuk logout dengan menekan lama gambar profile
         registerForContextMenu(mBinding.imgProfile);
