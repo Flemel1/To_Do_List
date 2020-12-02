@@ -15,6 +15,8 @@
             android:id="@+id/txt_tanggal"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="15dp"
             android:text="20"
             android:textColor="#000000"
             android:textSize="14sp" />
@@ -23,6 +25,7 @@
             android:id="@+id/txt_nama_task"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="15dp"
             android:text="Makan"
             android:textColor="#000000"
             android:textSize="14sp" />
