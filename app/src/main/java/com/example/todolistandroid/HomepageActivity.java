@@ -72,8 +72,8 @@ public class HomepageActivity extends AppCompatActivity {
         itemTouchhelper.attachToRecyclerView(mBinding.rcTask);
 
         mBinding.btnAdd.setOnClickListener(v -> addTask());
-        //Searching yang dicari harus datanya masih harus sama persis misal Lari harus Lari baru muncul
-        //belum bisa per karakter
+        //mBinding.btnAdd.setOnClickListener(v ->calendarAct());
+        //Searching yang dicari huruf awal atau huruf yang ada
         mBinding.editText.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
@@ -97,6 +97,11 @@ public class HomepageActivity extends AppCompatActivity {
         registerForContextMenu(mBinding.imgProfile);
     }
 
+    //navigasi ke calendar
+    private void calendarAct(){
+        Intent calIntent = new Intent(this, CalendarActivity.class);
+        startActivity(calIntent);
+    }
 
     private void addTask(){
         Intent taskintent = new Intent(this, AddTaskActivity.class);
@@ -117,12 +122,14 @@ public class HomepageActivity extends AppCompatActivity {
                                 // mengambil data dari firebase berdasarkan akun yang login
                                 Task myTask = new Task();
                                 Log.d(TAG, document.getId() + " => " + document.getData());
-                                myTask.setUid(document.getId());
+                                myTask.setUid(currentUser.getUid());
                                 myTask.setNamaTask(document.get("judul").toString());
                                 myTask.setTanggal(document.get("tanggal").toString());
                                 myTask.setWaktu(document.get("waktu").toString());
                                 myTask.setDeskripsi(document.get("desc").toString());
                                 myTask.setKategori(document.get("kategori").toString());
+                                //myTask.setNotifID(Integer.parseInt(document.get("notifID").toString()));
+                                myTask.setDocumentID(document.getId());
                                 // menghitung total item pada setiap kategori dan dimasukan kedalam object totalKategoriKegiatanTiapUser
                                 if (document.get("kategori").toString().equalsIgnoreCase("olahraga")) {
                                     totalKategoriKegiatanTiapUser.setTotalKatergoriOlahraga(1);
@@ -178,6 +185,7 @@ public class HomepageActivity extends AppCompatActivity {
                                     myTask.setWaktu(document.get("waktu").toString());
                                     myTask.setDeskripsi(document.get("desc").toString());
                                     myTask.setKategori(document.get("kategori").toString());
+                                    //myTask.setNotifID(Integer.parseInt(document.get("notifID").toString()));
                                     myTask.setDocumentID(document.getId());
                                     // menghitung total item pada setiap kategori dan dimasukan kedalam object totalKategoriKegiatanTiapUser
                                     if (document.get("kategori").toString().equalsIgnoreCase("olahraga")) {

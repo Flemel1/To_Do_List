@@ -8,6 +8,7 @@ public class Task {
     private String deskripsi;
     private String uid;
     private String documentID;
+    private int notifID;
 
     private int totalKatergoriOlahraga = 0;
     private int totalKatergoriPekerjaan = 0;
@@ -80,6 +81,14 @@ public class Task {
 
     public void setDocumentID(String documentID) {
         this.documentID = documentID;
+    }
+
+    public int getNotifID() {
+        return notifID;
+    }
+
+    public void setNotifID(int notifID) {
+        this.notifID = notifID;
     }
 
     public int getTotalKatergoriOlahraga() {
