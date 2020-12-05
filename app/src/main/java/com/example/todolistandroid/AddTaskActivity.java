@@ -170,7 +170,7 @@ public class AddTaskActivity extends AppCompatActivity implements
         Log.d(TAG, "NOTIFICATION_ID: "+rand);
         notificationIntent.putExtra(Reminder.NOTIFICATION_ID,  id);
         notificationIntent.putExtra(Reminder.NOTIFICATION, notification) ;
-        PendingIntent pendingIntent = PendingIntent.getBroadcast (this, 0 , notificationIntent , PendingIntent.FLAG_UPDATE_CURRENT ) ;
+        PendingIntent pendingIntent = PendingIntent.getBroadcast (this, id , notificationIntent , PendingIntent.FLAG_UPDATE_CURRENT ) ;
         Log.d("Activity", "Waktu: "+waktu);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE ) ;
         assert alarmManager != null;
