@@ -8,6 +8,7 @@
     tools:context=".HomepageActivity">
 
     <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/let_s_plan"
@@ -76,19 +77,28 @@
         android:id="@+id/rc_task"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginBottom="15dp"
         android:clipToPadding="false"
         android:overScrollMode="never"
         app:layout_constraintBottom_toTopOf="@id/btn_add"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/editText"
-        android:layout_marginBottom="15dp"
         app:layout_constraintVertical_bias="0.0" />
+
+    <ImageButton
+        android:id="@+id/btn_calendar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_kaategori_acara"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btn_add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
         android:src="@drawable/ic_add_"
         app:fabSize="auto"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -96,8 +106,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/rc_task"
-        app:layout_constraintVertical_bias="0.764"
-        android:layout_marginBottom="15dp"/>
+        app:layout_constraintVertical_bias="0.764" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

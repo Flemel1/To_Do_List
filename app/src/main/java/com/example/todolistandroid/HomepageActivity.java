@@ -72,7 +72,7 @@ public class HomepageActivity extends AppCompatActivity {
         itemTouchhelper.attachToRecyclerView(mBinding.rcTask);
 
         mBinding.btnAdd.setOnClickListener(v -> addTask());
-        //mBinding.btnAdd.setOnClickListener(v ->calendarAct());
+        mBinding.btnCalendar.setOnClickListener(v ->calendarAct());
         //Searching yang dicari huruf awal atau huruf yang ada
         mBinding.editText.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
