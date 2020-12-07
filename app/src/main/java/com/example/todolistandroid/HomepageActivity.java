@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.todolistandroid.adapter.CategoryAdapter;
@@ -24,6 +25,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -67,9 +70,11 @@ public class HomepageActivity extends AppCompatActivity {
         mBinding.rcCatergory.setLayoutManager(mLinearLayoutManager);
         mBinding.rcTask.setLayoutManager(mLinearLayoutManagerTask);
 
-        SwipeController swipeController = new SwipeController();
-        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeController);
-        itemTouchhelper.attachToRecyclerView(mBinding.rcTask);
+//        SwipeController swipeController = new SwipeController();
+//        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeController);
+//        itemTouchhelper.attachToRecyclerView(mBinding.rcTask);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(mBinding.rcTask);
 
         mBinding.btnAdd.setOnClickListener(v -> addTask());
         mBinding.btnCalendar.setOnClickListener(v ->calendarAct());
@@ -95,6 +100,47 @@ public class HomepageActivity extends AppCompatActivity {
         });
         //register context menu untuk logout dengan menekan lama gambar profile
         registerForContextMenu(mBinding.imgProfile);
+    }
+
+    ItemTouchHelper.SimpleCallback simpleCallback= new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT){
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+
+                switch(direction){
+                    case ItemTouchHelper.LEFT:
+                        Log.d(TAG, "onSwiped() returned: " + tasks.get(position).getDocumentID());
+                        delete(tasks.get(position).getDocumentID());
+                        tasks.remove(position);
+                        taskAdapter.notifyItemRemoved(position);
+                        break;
+                    case ItemTouchHelper.RIGHT:
+
+                        break;
+                }
+        }
+    };
+
+    private void delete(String documentID){
+        db.collection("Tasks").document(documentID)
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "DocumentSnapshot successfully deleted! DocID : "+documentID);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error deleting document", e);
+                    }
+                });
     }
 
     //navigasi ke calendar
