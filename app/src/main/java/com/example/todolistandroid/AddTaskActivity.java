@@ -24,16 +24,21 @@ import androidx.fragment.app.DialogFragment;
 
 import com.example.todolistandroid.databinding.ActivityAddtaskBinding;
 import com.example.todolistandroid.utils.Reminder;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.text.DateFormat;
 import java.util.Random;
@@ -52,10 +57,18 @@ public class AddTaskActivity extends AppCompatActivity implements
     private String currentCategory;
     private int year, month, day, rand;
     private long waktuInMilis;
+    private String docId;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private Calendar calendar = Calendar.getInstance();
+    private String judul;
+    private String waktu;
+    private String reminder;
+    private String desc;
+    private String uid;
+    private int modeInt =0;
+    private String tempDateString = "";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,6 +92,40 @@ public class AddTaskActivity extends AppCompatActivity implements
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mBinding.spinnerCategory.setAdapter(adapter);
         mBinding.spinnerCategory.setOnItemSelectedListener(this);
+
+//        Cek apakah ini ini edit?
+        myIntent = getIntent();
+        modeInt = myIntent.getIntExtra("mode", 0);
+        if(modeInt==1){ //if mode edit maka set field sesuai dengan yg ada
+            docId = myIntent.getStringExtra("docId");
+            db.collection("Tasks").document(docId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            rand = Integer.parseInt(document.getString("notifID"));
+                            currentDateString = document.getString("tanggal");
+                            mBinding.tvDate.setText(document.getString("tanggal"));
+                            List<String> catList = Arrays.asList(getResources().getStringArray(R.array.category_array));
+                            mBinding.txtAddTitle.setText(document.getString("judul"));
+                            for(int i=0;i<catList.size();i++){
+                                if(catList.get(i).equals(document.getString("kategori"))){
+                                    mBinding.spinnerCategory.setSelection(i);
+                                }
+                            }
+                            mBinding.txtAddTask.setText(document.getString("desc"));
+                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        } else {
+                            Log.d(TAG, "No such document");
+                        }
+                    } else {
+                        Log.d(TAG, "get failed with ", task.getException());
+                    }
+                }
+            });
+        }
+
     }
 
     @Override
@@ -101,13 +148,15 @@ public class AddTaskActivity extends AppCompatActivity implements
 
     private void save(){
 //        Save ke firebase
-        String judul = mBinding.txtAddTitle.getText().toString();
-        String waktu = mBinding.txtAddWaktu.getText().toString();
-        String reminder = mBinding.txtAddReminder.getText().toString();
-        String desc = mBinding.txtAddTask.getText().toString();
-        String uid = currentUser.getUid();
-        Random random = new Random();
-        rand = random.nextInt(10000);
+        judul = mBinding.txtAddTitle.getText().toString();
+        waktu = mBinding.txtAddWaktu.getText().toString();
+        reminder = mBinding.txtAddReminder.getText().toString();
+        desc = mBinding.txtAddTask.getText().toString();
+        uid = currentUser.getUid();
+        if(modeInt==0){
+            Random random = new Random();
+            rand = random.nextInt(10000);
+        }
         Map<String, Object> task = new HashMap<>();
         task.put("uid", uid);
         task.put("judul",judul);
@@ -117,21 +166,34 @@ public class AddTaskActivity extends AppCompatActivity implements
         task.put("desc",desc);
         task.put("kategori", currentCategory);
         task.put("notifID", String.valueOf(rand));
-        db.collection("Tasks").add(task)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        scheduleNotification(getNotification(judul, currentDateString+" "+waktu), rand, waktuInMilis);
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
-                    }
-                });
-
+        if(modeInt==0){
+            db.collection("Tasks").add(task)
+                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            scheduleNotification(getNotification(judul, currentDateString+" "+waktu), rand, waktuInMilis);
+                            Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "Error adding document", e);
+                        }
+                    });
+        }else{
+            db.collection("Tasks").document(docId).update(task).addOnSuccessListener(new OnSuccessListener(){
+                @Override
+                public void onSuccess(Object o) {
+                    scheduleNotification(getNotification(judul, currentDateString+" "+waktu), rand, waktuInMilis);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.w(TAG, "Error adding document", e);
+                }
+            });
+        }
 //        Move to Homepage Activity
         Intent intent = new Intent(this, HomepageActivity.class);
         startActivity(intent);

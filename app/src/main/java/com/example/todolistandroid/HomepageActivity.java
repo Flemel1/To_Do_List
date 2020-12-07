@@ -76,7 +76,7 @@ public class HomepageActivity extends AppCompatActivity {
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
         itemTouchHelper.attachToRecyclerView(mBinding.rcTask);
 
-        mBinding.btnAdd.setOnClickListener(v -> addTask());
+        mBinding.btnAdd.setOnClickListener(v -> addTask(0, "baru"));
         mBinding.btnCalendar.setOnClickListener(v ->calendarAct());
         //Searching yang dicari huruf awal atau huruf yang ada
         mBinding.editText.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -111,7 +111,6 @@ public class HomepageActivity extends AppCompatActivity {
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
-
                 switch(direction){
                     case ItemTouchHelper.LEFT:
                         Log.d(TAG, "onSwiped() returned: " + tasks.get(position).getDocumentID());
@@ -120,7 +119,7 @@ public class HomepageActivity extends AppCompatActivity {
                         taskAdapter.notifyItemRemoved(position);
                         break;
                     case ItemTouchHelper.RIGHT:
-
+                        addTask(1,tasks.get(position).getDocumentID());
                         break;
                 }
         }
@@ -149,9 +148,15 @@ public class HomepageActivity extends AppCompatActivity {
         startActivity(calIntent);
     }
 
-    private void addTask(){
-        Intent taskintent = new Intent(this, AddTaskActivity.class);
-        startActivity(taskintent);
+    private void addTask(int mode, String docId){
+        Intent taskIntent = new Intent(this, AddTaskActivity.class);
+        if(mode==1){
+            taskIntent.putExtra("mode",1);
+            taskIntent.putExtra("docId", docId);
+        }else{
+            taskIntent.putExtra("mode",0);
+        }
+        startActivity(taskIntent);
     }
 
     private void addTaskToList() {
