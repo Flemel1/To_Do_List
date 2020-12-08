@@ -30,7 +30,7 @@ public class Reminder extends BroadcastReceiver {
         boolean cancel = intent.getBooleanExtra(NOTIFICATION_CANCEL, false);
         if(cancel){
             notificationManager.cancel(TAG, id);
-            Log.d(TAG, "Id: "+id);
+            Log.d(TAG, "Cancel Id: "+id);
         }else{
             notificationManager.notify(id , notification);
             Log.d(TAG, "Id: "+id);

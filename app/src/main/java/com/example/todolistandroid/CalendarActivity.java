@@ -54,7 +54,8 @@ public class CalendarActivity extends AppCompatActivity {
         setContentView(mBinding.getRoot());
         myIntent = getIntent();
         Calendar c = Calendar.getInstance();
-        String currentDateString = DateFormat.getDateInstance(DateFormat.FULL).format(c.getTime());
+        String currentDateString =c.get(Calendar.DAY_OF_MONTH)+"-"+(c.get(Calendar.MONTH)+1)+"-"+c.get(Calendar.YEAR);
+        Log.d(TAG, currentDateString);
         addTaskToList(currentDateString);
         mLinearLayoutManager = new LinearLayoutManager(CalendarActivity.this,
                 LinearLayoutManager.HORIZONTAL, false);
@@ -68,9 +69,7 @@ public class CalendarActivity extends AppCompatActivity {
                 c.set(Calendar.YEAR, i);
                 c.set(Calendar.MONTH, i1);
                 c.set(Calendar.DAY_OF_MONTH, i2);
-                String currentDate = DateFormat.getDateInstance(DateFormat.FULL).format(c.getTime());
-                Log.d(TAG, "Date: "+currentDate);
-                Log.d(TAG, "Date: "+i+"-"+i1+"-"+i2);
+                String currentDate = c.get(Calendar.DAY_OF_MONTH)+"-"+(c.get(Calendar.MONTH)+1)+"-"+c.get(Calendar.YEAR);
                 addTaskToList(currentDate);
                 //addTaskToList();
             }
@@ -105,7 +104,7 @@ public class CalendarActivity extends AppCompatActivity {
                                 myTask.setWaktu(document.get("waktu").toString());
                                 myTask.setDeskripsi(document.get("desc").toString());
                                 myTask.setKategori(document.get("kategori").toString());
-                                //myTask.setNotifID(Integer.parseInt(document.get("notifID").toString()));
+                                myTask.setNotifID(Integer.parseInt(document.get("notifID").toString()));
                                 myTask.setDocumentID(document.getId());
                                 // menghitung total item pada setiap kategori dan dimasukan kedalam object totalKategoriKegiatanTiapUser
 //                                if (document.get("kategori").toString().equalsIgnoreCase("olahraga")) {

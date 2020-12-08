@@ -1,5 +1,8 @@
 package com.example.todolistandroid;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,6 +10,8 @@ import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -21,6 +26,7 @@ import com.example.todolistandroid.adapter.CategoryAdapter;
 import com.example.todolistandroid.adapter.TaskAdapter;
 import com.example.todolistandroid.databinding.ActivityHomepageBinding;
 import com.example.todolistandroid.model.Task;
+import com.example.todolistandroid.utils.Reminder;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -34,9 +40,10 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class HomepageActivity extends AppCompatActivity {
+public class HomepageActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
     private static final String TAG = "HomepageActivity";
     private final String KEY_PHOTO_URL = "photo";
 
@@ -52,6 +59,7 @@ public class HomepageActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private String currentFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +77,12 @@ public class HomepageActivity extends AppCompatActivity {
         mLinearLayoutManagerTask = new LinearLayoutManager(HomepageActivity.this,LinearLayoutManager.VERTICAL, false);
         mBinding.rcCatergory.setLayoutManager(mLinearLayoutManager);
         mBinding.rcTask.setLayoutManager(mLinearLayoutManagerTask);
-
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.category_array, android.R.layout.simple_spinner_item);
+        //adapter.add("All");
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mBinding.spinnerFilter.setAdapter(adapter);
+        mBinding.spinnerFilter.setOnItemSelectedListener(this);
 //        SwipeController swipeController = new SwipeController();
 //        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeController);
 //        itemTouchhelper.attachToRecyclerView(mBinding.rcTask);
@@ -114,7 +127,7 @@ public class HomepageActivity extends AppCompatActivity {
                 switch(direction){
                     case ItemTouchHelper.LEFT:
                         Log.d(TAG, "onSwiped() returned: " + tasks.get(position).getDocumentID());
-                        delete(tasks.get(position).getDocumentID());
+                        delete(tasks.get(position).getDocumentID(), tasks.get(position).getNotifID());
                         tasks.remove(position);
                         taskAdapter.notifyItemRemoved(position);
                         break;
@@ -125,13 +138,14 @@ public class HomepageActivity extends AppCompatActivity {
         }
     };
 
-    private void delete(String documentID){
+    private void delete(String documentID, int notifID){
         db.collection("Tasks").document(documentID)
                 .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "DocumentSnapshot successfully deleted! DocID : "+documentID);
+                        cancelNotification(notifID);
+                        Log.d(TAG, "DocumentSnapshot successfully deleted! DocID : "+documentID+"id: "+notifID);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -179,7 +193,9 @@ public class HomepageActivity extends AppCompatActivity {
                                 myTask.setWaktu(document.get("waktu").toString());
                                 myTask.setDeskripsi(document.get("desc").toString());
                                 myTask.setKategori(document.get("kategori").toString());
-                                //myTask.setNotifID(Integer.parseInt(document.get("notifID").toString()));
+                                if(document.contains("notifID")){
+                                    myTask.setNotifID(Integer.parseInt(document.get("notifID").toString()));
+                                }
                                 myTask.setDocumentID(document.getId());
                                 // menghitung total item pada setiap kategori dan dimasukan kedalam object totalKategoriKegiatanTiapUser
                                 if (document.get("kategori").toString().equalsIgnoreCase("olahraga")) {
@@ -218,6 +234,7 @@ public class HomepageActivity extends AppCompatActivity {
         searchTasks = new ArrayList<>();
         db.collection("Tasks")
                 .whereEqualTo("uid", currentUser.getUid())
+                .whereEqualTo("kategori", currentFilter)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -236,7 +253,9 @@ public class HomepageActivity extends AppCompatActivity {
                                     myTask.setWaktu(document.get("waktu").toString());
                                     myTask.setDeskripsi(document.get("desc").toString());
                                     myTask.setKategori(document.get("kategori").toString());
-                                    //myTask.setNotifID(Integer.parseInt(document.get("notifID").toString()));
+                                    if(document.contains("notifID")){
+                                        myTask.setNotifID(Integer.parseInt(document.get("notifID").toString()));
+                                    }
                                     myTask.setDocumentID(document.getId());
                                     // menghitung total item pada setiap kategori dan dimasukan kedalam object totalKategoriKegiatanTiapUser
                                     if (document.get("kategori").toString().equalsIgnoreCase("olahraga")) {
@@ -276,6 +295,15 @@ public class HomepageActivity extends AppCompatActivity {
         stringList.add("Rekreasi");
     }
 
+    private void cancelNotification(int id){
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent myIntent = new Intent(getApplicationContext(), Reminder.class);
+        myIntent.putExtra(Reminder.NOTIFICATION_ID, id);
+        myIntent.putExtra(Reminder.NOTIFICATION_CANCEL, true) ;
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), id, myIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        alarmManager.cancel(pendingIntent);
+    }
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -290,6 +318,17 @@ public class HomepageActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
         return true;
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        Log.d("TAG", "onItemSelected() called with: adapterView = [" + adapterView + "], view = [" + view + "], i = [" + i + "], l = [" + l + "]"+" item selected: "+adapterView.getItemAtPosition(i));
+        currentFilter = adapterView.getItemAtPosition(i).toString();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+        
     }
 
     // fungsi logout

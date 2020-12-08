@@ -37,6 +37,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +56,7 @@ public class AddTaskActivity extends AppCompatActivity implements
     private Intent myIntent;
     private String currentDateString;
     private String currentCategory;
-    private int year, month, day, rand;
+    private int year = -1, month = -1, day = -1, hour = -1, minute = -1,rand;
     private long waktuInMilis;
     private String docId;
     private FirebaseAuth mAuth;
@@ -67,6 +68,7 @@ public class AddTaskActivity extends AppCompatActivity implements
     private String reminder;
     private String desc;
     private String uid;
+    private String tanggal;
     private int modeInt =0;
     private String tempDateString = "";
 
@@ -77,6 +79,8 @@ public class AddTaskActivity extends AppCompatActivity implements
         currentUser = mAuth.getCurrentUser();
         mBinding = ActivityAddtaskBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
+        mBinding.tvDate.setText(calendar.get(Calendar.DAY_OF_MONTH)+"-"+(calendar.get(Calendar.MONTH)+1)+"-"+calendar.get(Calendar.YEAR));
+        mBinding.txtAddWaktu.setText(calendar.get(Calendar.HOUR_OF_DAY)+":"+(calendar.get(Calendar.MINUTE)));
         mBinding.btnDate.setOnClickListener(v -> {
             DialogFragment datePicker = new DatePickerFragment();
             datePicker.show(getSupportFragmentManager(), "date picker");
@@ -105,8 +109,12 @@ public class AddTaskActivity extends AppCompatActivity implements
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
                             rand = Integer.parseInt(document.getString("notifID"));
+                            Log.d(TAG, "rand: "+rand);
                             currentDateString = document.getString("tanggal");
+                            tanggal = document.getString("tanggal");
                             mBinding.tvDate.setText(document.getString("tanggal"));
+                            mBinding.txtAddWaktu.setText(document.getString("waktu"));
+                            getWaktuFromString(document.getString("tanggal"),  document.getString("waktu"));
                             List<String> catList = Arrays.asList(getResources().getStringArray(R.array.category_array));
                             mBinding.txtAddTitle.setText(document.getString("judul"));
                             for(int i=0;i<catList.size();i++){
@@ -132,13 +140,15 @@ public class AddTaskActivity extends AppCompatActivity implements
     public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.YEAR, year);
-        this.year = year;
         c.set(Calendar.MONTH, month);
-        this.month = month;
         c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+        this.year = year;
+        this.month = month;
         this.day = dayOfMonth;
-        currentDateString = DateFormat.getDateInstance(DateFormat.FULL).format(c.getTime());
-        mBinding.tvDate.setText(currentDateString);
+        //currentDateString = DateFormat.getDateInstance(DateFormat.FULL).format(c.getTime());
+        String date = day+"-"+(month+1)+"-"+year;
+        Log.d(TAG, date);
+        mBinding.tvDate.setText(date);
     }
 
     private void cancel(){
@@ -149,9 +159,11 @@ public class AddTaskActivity extends AppCompatActivity implements
     private void save(){
 //        Save ke firebase
         judul = mBinding.txtAddTitle.getText().toString();
+        tanggal = mBinding.tvDate.getText().toString();
         waktu = mBinding.txtAddWaktu.getText().toString();
         reminder = mBinding.txtAddReminder.getText().toString();
         desc = mBinding.txtAddTask.getText().toString();
+        getWaktuFromString(tanggal, waktu);
         uid = currentUser.getUid();
         if(modeInt==0){
             Random random = new Random();
@@ -160,7 +172,7 @@ public class AddTaskActivity extends AppCompatActivity implements
         Map<String, Object> task = new HashMap<>();
         task.put("uid", uid);
         task.put("judul",judul);
-        task.put("tanggal",currentDateString);
+        task.put("tanggal",tanggal);
         task.put("waktu",waktu);
         task.put("reminder",reminder);
         task.put("desc",desc);
@@ -171,7 +183,7 @@ public class AddTaskActivity extends AppCompatActivity implements
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
-                            scheduleNotification(getNotification(judul, currentDateString+" "+waktu), rand, waktuInMilis);
+                            scheduleNotification(getNotification(judul, tanggal+" "+waktu), rand, timeInMillis());
                             Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
                         }
                     })
@@ -185,7 +197,8 @@ public class AddTaskActivity extends AppCompatActivity implements
             db.collection("Tasks").document(docId).update(task).addOnSuccessListener(new OnSuccessListener(){
                 @Override
                 public void onSuccess(Object o) {
-                    scheduleNotification(getNotification(judul, currentDateString+" "+waktu), rand, waktuInMilis);
+                    cancelNotification(rand);
+                    scheduleNotification(getNotification(judul, currentDateString+" "+waktu), rand, timeInMillis());
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -219,16 +232,51 @@ public class AddTaskActivity extends AppCompatActivity implements
         calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
         calendar.set(Calendar.MINUTE, minute);
         calendar.set(Calendar.SECOND, 0);
+        this.hour = hourOfDay;
+        this.minute = minute;
         String textTime = DateFormat.getTimeInstance(DateFormat.SHORT).format(calendar.getTime());
         mBinding.txtAddWaktu.setText(textTime);
+    }
+
+    public void getWaktuFromString(String tanggal, String waktu){
+        day = Integer.parseInt(tanggal.split("-")[0]);
+        month = Integer.parseInt(tanggal.split("-")[1])-1;
+        year = Integer.parseInt(tanggal.split("-")[2]);
+        hour = Integer.parseInt(waktu.split(":")[0]);
+        minute = Integer.parseInt(waktu.split(":")[1]);
+        Log.d(TAG, "DATETIME: "+day+month+year+hour+minute);
+    }
+
+    public long timeInMillis(){
+        Calendar calendar = Calendar.getInstance();
+        if(this.year == -1){
+            this.year = calendar.get(Calendar.YEAR);
+        }
+        if(this.month == -1){
+            this.month = calendar.get(Calendar.MONTH);
+        }
+        if(this.day == -1){
+            this.day = calendar.get(Calendar.DAY_OF_MONTH);
+        }
+        if(this.hour == -1){
+            this.hour = calendar.get(Calendar.HOUR_OF_DAY);
+        }
+        if(this.minute == -1){
+            this.minute = calendar.get(Calendar.MINUTE);
+        }
+        calendar.set(Calendar.YEAR, this.year);
+        calendar.set(Calendar.MONTH, this.month);
+        calendar.set(Calendar.DAY_OF_MONTH, this.day);
+        calendar.set(Calendar.HOUR_OF_DAY, this.hour);
+        calendar.set(Calendar.MINUTE, this.minute);
+        calendar.set(Calendar.SECOND, 0);
         waktuInMilis = calendar.getTimeInMillis();
+        return waktuInMilis;
     }
 
     //untuk menjadwalkan notifikasi
     private void scheduleNotification(Notification notification, int id, long waktu) {
         Intent notificationIntent = new Intent( this, Reminder.class );
-        //listNotifID.add(rand);
-        //listId.setText(listNotifID.toString());
         Log.d(TAG, "NOTIFICATION_ID: "+rand);
         notificationIntent.putExtra(Reminder.NOTIFICATION_ID,  id);
         notificationIntent.putExtra(Reminder.NOTIFICATION, notification) ;
@@ -252,15 +300,11 @@ public class AddTaskActivity extends AppCompatActivity implements
 
     //untuk cancel notifikasi yang telah ada
     private void cancelNotification(int id){
-        //if (listNotifID.contains(id)){
-            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-            Intent myIntent = new Intent(getApplicationContext(), Reminder.class);
-            myIntent.putExtra(Reminder.NOTIFICATION_ID, id);
-            //listNotifID.remove(id);
-            //listId.setText(listNotifID.toString());
-            myIntent.putExtra(Reminder.NOTIFICATION_CANCEL, true) ;
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            alarmManager.cancel(pendingIntent);
-        //}
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent myIntent = new Intent(getApplicationContext(), Reminder.class);
+        myIntent.putExtra(Reminder.NOTIFICATION_ID, id);
+        myIntent.putExtra(Reminder.NOTIFICATION_CANCEL, true) ;
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), id, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        alarmManager.cancel(pendingIntent);
     }
 }
