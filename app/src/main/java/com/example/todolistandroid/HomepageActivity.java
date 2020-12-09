@@ -136,6 +136,8 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
                         break;
                 }
         }
+
+
     };
 
     private void delete(String documentID, int notifID){
@@ -172,6 +174,13 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
         }
         startActivity(taskIntent);
     }
+
+//    private void detailTask(String docId){
+//        Intent detailTaskIntent = new Intent(this, AddTaskActivity.class);
+//        detailTaskIntent.putExtra("mode", 2);
+//        detailTaskIntent.putExtra("docId", docId);
+//        startActivity(detailTaskIntent);
+//    }
 
     private void addTaskToList() {
         tasks = new ArrayList<>();
@@ -217,6 +226,7 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
                                     totalKategoriKegiatanTiapUser.setTotalKatergoriRekreasi(1);
                                 }
                                 tasks.add(myTask);
+
                             }
                             taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
                             categoryAdapter = new CategoryAdapter(getApplicationContext(), stringList, totalKategoriKegiatanTiapUser);
@@ -242,6 +252,7 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
                         Task totalKategoriKegiatanTiapUser = new Task();
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
+                                searchTasks = new ArrayList<>();
                                 // mengambil data dari firebase berdasarkan akun yang login dan judul yang disearch
                                 String dataSearch = document.get("judul").toString().toLowerCase();
                                 if(dataSearch.contains(search) || dataSearch.startsWith(search)) {
@@ -272,6 +283,7 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
                                         totalKategoriKegiatanTiapUser.setTotalKatergoriRekreasi(1);
                                     }
                                     searchTasks.add(myTask);
+
                                 }
                             }
                             taskAdapter = new TaskAdapter(getApplicationContext(), searchTasks);
@@ -325,6 +337,7 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
         Log.d("TAG", "onItemSelected() called with: adapterView = [" + adapterView + "], view = [" + view + "], i = [" + i + "], l = [" + l + "]"+" item selected: "+adapterView.getItemAtPosition(i));
         currentFilter = adapterView.getItemAtPosition(i).toString();
     }
+
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
