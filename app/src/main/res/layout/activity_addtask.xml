@@ -19,13 +19,13 @@
             android:layout_height="wrap_content">
 
             <ImageView
-                android:layout_width="42dp"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.75"
                 android:paddingLeft="20dp"
                 android:paddingTop="20dp"
                 android:paddingRight="20dp"
-                android:src="@drawable/ic_kaategori_acara" />
+                android:src="@drawable/ic_icons_calendar" />
 
             <TextView
                 android:id="@+id/tvDate"
@@ -35,11 +35,15 @@
                 android:text="TextView" />
 
             <Button
+
                 android:id="@+id/btnDate"
-                android:layout_width="wrap_content"
+                android:layout_width="40dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.75"
-                android:text="Select Date" />
+                android:text="Select Date"
+                android:layout_marginRight="8dp"
+                android:layout_gravity="right"
+                app:backgroundTint="@color/primer" />
 
         </LinearLayout>
 
@@ -61,6 +65,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="0.25"
+                android:fontFamily="sans-serif-condensed-medium"
                 android:hint="Title"
                 android:paddingLeft="20dp"
                 android:paddingTop="20dp"
@@ -78,41 +83,18 @@
                 android:paddingLeft="20dp"
                 android:paddingTop="20dp"
                 android:paddingRight="20dp"
-                android:src="@drawable/ic_kaategori_acara" />
+                android:src="@drawable/ic_icons_clock" />
 
             <TextView
                 android:id="@+id/txtAddWaktu"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="0.25"
+                android:fontFamily="sans-serif-condensed-medium"
                 android:paddingLeft="20dp"
                 android:paddingTop="20dp"
                 android:paddingRight="20dp"
                 android:text="Waktu Belum Diset" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.75"
-                android:paddingLeft="20dp"
-                android:paddingTop="20dp"
-                android:paddingRight="20dp"
-                android:src="@drawable/ic_kaategori_acara" />
-
-            <EditText
-                android:id="@+id/txtAddReminder"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.25"
-                android:paddingLeft="20dp"
-                android:paddingTop="20dp"
-                android:paddingRight="20dp"
-                android:text="Reminder" />
         </LinearLayout>
 
         <LinearLayout
@@ -141,6 +123,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@null"
+            android:fontFamily="@font/cairo_bold"
             android:gravity="top|left"
             android:hint="Write Your Task Here"
             android:inputType="textMultiLine"
@@ -157,23 +140,33 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="start"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            >
 
             <Button
                 android:id="@+id/btnCancel"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
+                android:layout_gravity="left"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="12dp"
                 android:layout_weight="1"
-                android:text="Cancel" />
+                android:backgroundTint="#F7F0FF"
+                android:text="Cancel"
+                android:textColor="@color/primer" />
 
             <Button
                 android:id="@+id/btnSave"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
+                android:layout_gravity="right"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="8dp"
                 android:layout_weight="1"
-                android:text="Save" />
+                android:text="Save"
+                app:backgroundTint="@color/primer" />
         </LinearLayout>
 
     </LinearLayout>

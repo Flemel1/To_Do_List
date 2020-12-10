@@ -4,15 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#28abb9"
     tools:context=".HomepageActivity">
+
+    <View
+        android:layout_width="634dp"
+        android:layout_height="249dp"
+        android:background="@drawable/ic_wave"
+        android:translationX="-125dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/montserrat_alternates_bold"
         android:text="@string/let_s_plan"
-        android:textColor="#000000"
+        android:textColor="@color/putih"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.132"
@@ -27,7 +35,7 @@
         android:layout_height="100dp"
         android:src="@drawable/ic_launcher_background"
         app:civ_border_color="#FF000000"
-        app:civ_border_width="2dp"
+        app:civ_border_width="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.852"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -36,11 +44,13 @@
         app:layout_constraintVertical_bias="0.09" />
 
     <TextView
+        android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
         android:text="@string/my_schedule"
-        android:textColor="#000000"
-        android:textSize="20sp"
+        android:textColor="@color/putih"
+        android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.121"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -85,25 +95,32 @@
 
     <Button
         android:id="@+id/btn_active_task"
+        style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/editText"
+        android:layout_marginStart="15dp"
+        android:onClick="onActiveTask"
+        android:text="Active Task"
+        android:textColor="@color/primer"
+        app:backgroundTint="#FFFFFF"
+        app:elevation="0dp"
         app:layout_constraintRight_toLeftOf="@id/btn_deactive_task"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="15dp"
-        android:text="Active Task"
-        android:onClick="onActiveTask"/>
+        app:layout_constraintTop_toBottomOf="@+id/editText" />
 
     <Button
         android:id="@+id/btn_deactive_task"
+        style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/editText"
-        app:layout_constraintLeft_toRightOf="@id/btn_active_task"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="15dp"
+        android:onClick="onDeactiveTask"
         android:text="Deactive Task"
-        android:onClick="onDeactiveTask"/>
+        android:textColor="@color/primer"
+        app:elevation="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/btn_active_task"
+        app:layout_constraintTop_toBottomOf="@+id/editText" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rc_task"
@@ -120,9 +137,9 @@
 
     <ImageButton
         android:id="@+id/btn_calendar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_kaategori_acara"
+        android:layout_width="51dp"
+        android:layout_height="43dp"
+        android:background="@drawable/ic_icons_calendar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -132,13 +149,16 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="15dp"
         android:src="@drawable/ic_add_"
+        android:tint="#FFFFFF"
+        app:backgroundTint="@color/primer"
         app:fabSize="auto"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/rc_task"
-        app:layout_constraintVertical_bias="0.764" />
+        app:layout_constraintVertical_bias="0.764"
+        app:rippleColor="@color/putih" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -175,7 +175,6 @@ public class AddTaskActivity extends AppCompatActivity implements
         judul = mBinding.txtAddTitle.getText().toString();
         tanggal = mBinding.tvDate.getText().toString();
         waktu = mBinding.txtAddWaktu.getText().toString();
-        reminder = mBinding.txtAddReminder.getText().toString();
         desc = mBinding.txtAddTask.getText().toString();
         //getWaktuFromString(tanggal, waktu);
         uid = currentUser.getUid();

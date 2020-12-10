@@ -4,15 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#28abb9"
+    android:background="@color/primer"
     tools:context=".CalendarActivity">
 
     <CalendarView
         android:id="@+id/calendar"
+        style="@android:style/Widget.Material.Light.CalendarView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="361dp"
-        android:background="@color/cardview_light_background"
+        android:background="@color/putih"
+        android:selectedDateVerticalBar="@color/primer"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.132"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -35,9 +37,12 @@
 
     <Button
         android:id="@+id/btnBack"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="239dp"
+        android:layout_height="48dp"
         android:text="Back"
+        android:textColor="@color/primer"
+        app:backgroundTint="@color/putih"
+        app:cornerRadius="6dp"
         app:fabSize="auto"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
