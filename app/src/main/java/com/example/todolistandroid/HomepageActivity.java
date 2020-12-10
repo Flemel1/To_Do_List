@@ -39,8 +39,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class HomepageActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
@@ -54,12 +57,15 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
     private TaskAdapter taskAdapter;
     private List<String> stringList;
     List<Task> tasks;
+    List<Task> deactiveTask;
     List<Task> searchTasks;
     private Intent myIntent;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String currentFilter;
+    //variabel untuk mengambil tanggal saat ini
+    private Calendar currentCalendar = Calendar.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +78,7 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
         Glide.with(this).load(currentUser.getPhotoUrl()).into(mBinding.imgProfile);
         addItemToList();
         addTaskToList();
+        ArrayAdapter<CharSequence> adapterArray = ArrayAdapter.createFromResource(this,R.array.filter_array, android.R.layout.simple_spinner_item);
         mLinearLayoutManager = new LinearLayoutManager(HomepageActivity.this,
                 LinearLayoutManager.HORIZONTAL, false);
         mLinearLayoutManagerTask = new LinearLayoutManager(HomepageActivity.this,LinearLayoutManager.VERTICAL, false);
@@ -108,7 +115,7 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
             }
         });
         mBinding.editText.setOnCloseListener(() -> {
-            addTaskToList();
+            searchList("");
             return false;
         });
         //register context menu untuk logout dengan menekan lama gambar profile
@@ -184,6 +191,7 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
 
     private void addTaskToList() {
         tasks = new ArrayList<>();
+        deactiveTask = new ArrayList<>();
         db.collection("Tasks")
                 .whereEqualTo("uid", currentUser.getUid())
                 .get()
@@ -225,8 +233,21 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
                                 else if(document.get("kategori").toString().equalsIgnoreCase("rekreasi")) {
                                     totalKategoriKegiatanTiapUser.setTotalKatergoriRekreasi(1);
                                 }
-                                tasks.add(myTask);
-
+                                try {
+                                    Calendar taskCalendar = Calendar.getInstance();
+                                    Date dateOfTask = new SimpleDateFormat("dd-MM-yyyy").parse(document.get("tanggal").toString());
+                                    taskCalendar.setTime(dateOfTask);
+                                    int today = currentCalendar.get(Calendar.DAY_OF_MONTH);
+                                    int currentMonth = currentCalendar.get(Calendar.MONTH);
+                                    int dayTask = taskCalendar.get(Calendar.DAY_OF_MONTH);
+                                    int monthTask = taskCalendar.get(Calendar.MONTH);
+                                    if (today <= dayTask && currentMonth <= monthTask)
+                                        tasks.add(myTask);
+                                    else
+                                        deactiveTask.add(myTask);
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
                             }
                             taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
                             categoryAdapter = new CategoryAdapter(getApplicationContext(), stringList, totalKategoriKegiatanTiapUser);
@@ -242,59 +263,22 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
     //fungsi searching
     private void searchList(String search) {
         searchTasks = new ArrayList<>();
-        db.collection("Tasks")
-                .whereEqualTo("uid", currentUser.getUid())
-                .whereEqualTo("kategori", currentFilter)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<QuerySnapshot> task) {
-                        Task totalKategoriKegiatanTiapUser = new Task();
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                searchTasks = new ArrayList<>();
-                                // mengambil data dari firebase berdasarkan akun yang login dan judul yang disearch
-                                String dataSearch = document.get("judul").toString().toLowerCase();
-                                if(dataSearch.contains(search) || dataSearch.startsWith(search)) {
-                                    Task myTask = new Task();
-                                    Log.d(TAG, document.getId() + " => " + document.getData());
-                                    myTask.setUid(currentUser.getUid());
-                                    myTask.setNamaTask(document.get("judul").toString());
-                                    myTask.setTanggal(document.get("tanggal").toString());
-                                    myTask.setWaktu(document.get("waktu").toString());
-                                    myTask.setDeskripsi(document.get("desc").toString());
-                                    myTask.setKategori(document.get("kategori").toString());
-                                    if(document.contains("notifID")){
-                                        myTask.setNotifID(Integer.parseInt(document.get("notifID").toString()));
-                                    }
-                                    myTask.setDocumentID(document.getId());
-                                    // menghitung total item pada setiap kategori dan dimasukan kedalam object totalKategoriKegiatanTiapUser
-                                    if (document.get("kategori").toString().equalsIgnoreCase("olahraga")) {
-                                        totalKategoriKegiatanTiapUser.setTotalKatergoriOlahraga(1);
-                                    } else if (document.get("kategori").toString().equalsIgnoreCase("pekerjaan")) {
-                                        totalKategoriKegiatanTiapUser.setTotalKatergoriPekerjaan(1);
-                                    } else if (document.get("kategori").toString().equalsIgnoreCase("acara")) {
-                                        totalKategoriKegiatanTiapUser.setTotalKatergoriAcara(1);
-                                    } else if (document.get("kategori").toString().equalsIgnoreCase("makan")) {
-                                        totalKategoriKegiatanTiapUser.setTotalKatergoriMakan(1);
-                                    } else if (document.get("kategori").toString().equalsIgnoreCase("meeting")) {
-                                        totalKategoriKegiatanTiapUser.setTotalKatergoriMeeting(1);
-                                    } else if (document.get("kategori").toString().equalsIgnoreCase("rekreasi")) {
-                                        totalKategoriKegiatanTiapUser.setTotalKatergoriRekreasi(1);
-                                    }
-                                    searchTasks.add(myTask);
-
-                                }
-                            }
-                            taskAdapter = new TaskAdapter(getApplicationContext(), searchTasks);
-                            categoryAdapter = new CategoryAdapter(getApplicationContext(), stringList, totalKategoriKegiatanTiapUser);
-                            mBinding.rcTask.setAdapter(taskAdapter);
-                            mBinding.rcCatergory.setAdapter(categoryAdapter);
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
-                        }
+        if (search.equals("")) {
+            taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
+            mBinding.rcTask.setAdapter(taskAdapter);
+        }
+        else {
+            for (Task task : tasks){
+                String dataSearch = task.getNamaTask().toLowerCase();
+                if(currentFilter.equals("Semua") || task.getKategori().equals(currentFilter)){
+                    if(dataSearch.contains(search) || dataSearch.startsWith(search)) {
+                        searchTasks.add(task);
                     }
-                });
+                }
+            }
+            taskAdapter = new TaskAdapter(getApplicationContext(), searchTasks);
+            mBinding.rcTask.setAdapter(taskAdapter);
+        }
     }
 
     private void addItemToList() {
@@ -336,6 +320,7 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         Log.d("TAG", "onItemSelected() called with: adapterView = [" + adapterView + "], view = [" + view + "], i = [" + i + "], l = [" + l + "]"+" item selected: "+adapterView.getItemAtPosition(i));
         currentFilter = adapterView.getItemAtPosition(i).toString();
+        searchList("");
     }
 
 
@@ -358,5 +343,15 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
                 Toast.makeText(getApplicationContext(), "Logout berhasil", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void onActiveTask(View view) {
+        taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
+        mBinding.rcTask.setAdapter(taskAdapter);
+    }
+
+    public void onDeactiveTask(View view) {
+        taskAdapter = new TaskAdapter(getApplicationContext(), deactiveTask);
+        mBinding.rcTask.setAdapter(taskAdapter);
     }
 }
