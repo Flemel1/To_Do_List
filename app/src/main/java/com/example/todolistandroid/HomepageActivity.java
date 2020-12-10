@@ -76,6 +76,7 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
         mBinding = ActivityHomepageBinding.inflate(getLayoutInflater());
         setContentView(mBinding.getRoot());
         myIntent = getIntent();
+        taskMode = "active";
         Glide.with(this).load(currentUser.getPhotoUrl()).into(mBinding.imgProfile);
         addItemToList();
         addTaskToList();
