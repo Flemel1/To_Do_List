@@ -374,14 +374,22 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
     }
 
     public void onActiveTask(View view) {
-        taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
-        mBinding.rcTask.setAdapter(taskAdapter);
         taskMode = "active";
+        if(currentFilter.equals("Semua")){
+            taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
+            mBinding.rcTask.setAdapter(taskAdapter);
+        }else{
+            searchList("");
+        }
     }
 
     public void onDeactiveTask(View view) {
-        taskAdapter = new TaskAdapter(getApplicationContext(), deactiveTask);
-        mBinding.rcTask.setAdapter(taskAdapter);
         taskMode = "deactive";
+        if(currentFilter.equals("Semua")){
+            taskAdapter = new TaskAdapter(getApplicationContext(), deactiveTask);
+            mBinding.rcTask.setAdapter(taskAdapter);
+        }else{
+            searchList("");
+        }
     }
 }
