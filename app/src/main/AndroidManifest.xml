@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.todolistandroid">
-
+    <uses-permission android:name = "android.permission.VIBRATE" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -11,6 +11,8 @@
         android:theme="@style/Theme.ToDoListAndroid">
         <activity android:name=".HomepageActivity"></activity>
         <activity android:name=".AddTaskActivity"></activity>
+        <activity android:name=".DetailTaskActivity"></activity>
+        <activity android:name=".CalendarActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -18,6 +20,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver android:name = ".utils.Reminder"/>
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

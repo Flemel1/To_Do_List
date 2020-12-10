@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="50dp"
     android:focusable="true"
     android:clickable="true"
-    android:layout_margin="8dp">
+    android:layout_margin="8dp"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,30 +14,31 @@
 
         <TextView
             android:id="@+id/txt_tanggal"
-            android:layout_width="100dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginEnd="15dp"
+            android:layout_marginEnd="20dp"
             android:text="20"
             android:textColor="#000000"
-            android:textSize="14sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/txt_nama_task"
-            android:layout_width="100dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="15dp"
+            android:layout_marginEnd="20dp"
             android:text="Makan"
             android:textColor="#000000"
-            android:textSize="14sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/txt_waktu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="10:50"
+            android:layout_marginEnd="20sp"
             android:textColor="#000000"
-            android:textSize="15sp" />
+            android:textSize="16sp" />
 
     </LinearLayout>
 

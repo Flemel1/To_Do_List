@@ -10,4 +10,13 @@
         <item>Meeting</item>
         <item>Rekreasi</item>
     </string-array>
+    <string-array name="filter_array">
+        <item>Semua</item>
+        <item>Olahraga</item>
+        <item>Pekerjaan</item>
+        <item>Acara</item>
+        <item>Makan</item>
+        <item>Meeting</item>
+        <item>Rekreasi</item>
+    </string-array>
 </resources>

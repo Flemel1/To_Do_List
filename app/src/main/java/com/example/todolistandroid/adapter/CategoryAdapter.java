@@ -21,12 +21,12 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     private Context context;
     private List<String> stringList = new ArrayList<>();
     private Task myTask;
-    private int[] idImage = new int[]{R.drawable.ic_baseline_sports_volleyball_24,
-                                        R.drawable.ic_kategori_pekerjaan,
-                                        R.drawable.ic_kaategori_acara,
-                                        R.drawable.ic_kategori_makan,
-                                        R.drawable.ic_kategori_meeting,
-                                        R.drawable.ic_kategori_rekreasi};
+    private int[] idImage = new int[]{R.drawable.ic_basketball,
+                                        R.drawable.ic_folder,
+                                        R.drawable.ic_festival,
+                                        R.drawable.ic_healthy_eating,
+                                        R.drawable.ic_videoconference,
+                                        R.drawable.ic_van};
 
     public CategoryAdapter(Context context, List<String> stringList, Task myTask) {
         this.context = context;
