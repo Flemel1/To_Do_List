@@ -85,8 +85,6 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
         mBinding.rcCatergory.setLayoutManager(mLinearLayoutManager);
         mBinding.rcTask.setLayoutManager(mLinearLayoutManagerTask);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.filter_array, android.R.layout.simple_spinner_item);
-        //adapter.add("All");
-        // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mBinding.spinnerFilter.setAdapter(adapter);
         mBinding.spinnerFilter.setOnItemSelectedListener(this);
@@ -144,7 +142,6 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
                             deactiveTask.remove(position);
                             taskAdapter.notifyItemRemoved(position);
                         }
-
                         break;
                     case ItemTouchHelper.RIGHT:
                         if(taskMode.equals("active")){
@@ -224,9 +221,7 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
                                 myTask.setWaktu(document.get("waktu").toString());
                                 myTask.setDeskripsi(document.get("desc").toString());
                                 myTask.setKategori(document.get("kategori").toString());
-                                if(document.contains("notifID")){
-                                    myTask.setNotifID(Integer.parseInt(document.get("notifID").toString()));
-                                }
+                                myTask.setNotifID(Integer.parseInt(document.get("notifID").toString()));
                                 myTask.setDocumentID(document.getId());
                                 // menghitung total item pada setiap kategori dan dimasukan kedalam object totalKategoriKegiatanTiapUser
                                 if (document.get("kategori").toString().equalsIgnoreCase("olahraga")) {
