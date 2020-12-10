@@ -143,11 +143,6 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
                             delete(deactiveTask.get(position).getDocumentID(), deactiveTask.get(position).getNotifID());
                             deactiveTask.remove(position);
                             taskAdapter.notifyItemRemoved(position);
-                        }else if(taskMode.equals("search")){
-                            Log.d(TAG, "onSwiped() returned: " + searchTasks.get(position).getDocumentID());
-                            delete(searchTasks.get(position).getDocumentID(), searchTasks.get(position).getNotifID());
-                            searchTasks.remove(position);
-                            taskAdapter.notifyItemRemoved(position);
                         }
 
                         break;
@@ -305,7 +300,6 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
             }
             taskAdapter = new TaskAdapter(getApplicationContext(), searchTasks);
             mBinding.rcTask.setAdapter(taskAdapter);
-            taskMode = "search";
         }
     }
 

@@ -267,11 +267,13 @@ public class AddTaskActivity extends AppCompatActivity implements
     }
 
     public void getWaktuFromString(String tanggal, String waktu){
+        //ubah simbol "." menjadi ":"
+        String newWaktu = waktu.replace(".",":");
         day = Integer.parseInt(tanggal.split("-")[0]);
         month = Integer.parseInt(tanggal.split("-")[1])-1;
         year = Integer.parseInt(tanggal.split("-")[2]);
-        hour = Integer.parseInt(waktu.split(":")[0]);
-        minute = Integer.parseInt(waktu.split(":")[1]);
+        hour = Integer.parseInt(newWaktu.split(":")[0]);
+        minute = Integer.parseInt(newWaktu.split(":")[1]);
         Log.d(TAG, "DATETIME: "+day+month+year+hour+minute);
     }
 
