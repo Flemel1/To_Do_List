@@ -35,6 +35,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -71,6 +73,7 @@ public class AddTaskActivity extends AppCompatActivity implements
     private String tanggal;
     private int modeInt =0;
     private String tempDateString = "";
+    private Calendar currentCalendar = Calendar.getInstance();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -198,7 +201,32 @@ public class AddTaskActivity extends AppCompatActivity implements
                 @Override
                 public void onSuccess(Object o) {
                     cancelNotification(rand);
-                    scheduleNotification(getNotification(judul, currentDateString+" "+waktu), rand, timeInMillis());
+                    Calendar taskCalendar = Calendar.getInstance();
+                    Date dateOfTask = null;
+                    try {
+                        dateOfTask = new SimpleDateFormat("dd-MM-yyyy").parse(tanggal);
+                        taskCalendar.setTime(dateOfTask);
+                        taskCalendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(waktu.split(":")[0]));
+                        taskCalendar.set(Calendar.MINUTE, Integer.parseInt(waktu.split(":")[1]));
+                        Log.d(TAG, "Date: "+dateOfTask);
+                        int today = currentCalendar.get(Calendar.DAY_OF_MONTH);
+                        int currentMonth = currentCalendar.get(Calendar.MONTH);
+                        int currentYear = currentCalendar.get(Calendar.YEAR);
+                        int currentHour = currentCalendar.get(Calendar.HOUR_OF_DAY);
+                        int currentMin = currentCalendar.get(Calendar.MINUTE);
+                        int dayTask = taskCalendar.get(Calendar.DAY_OF_MONTH);
+                        int monthTask = taskCalendar.get(Calendar.MONTH);
+                        int yearTask = taskCalendar.get(Calendar.YEAR);
+                        int hourTask = taskCalendar.get(Calendar.HOUR_OF_DAY);
+                        int minTask = taskCalendar.get(Calendar.MINUTE);
+                        if (today <= dayTask && currentMonth <= monthTask && currentYear <= yearTask && currentHour <= hourTask && currentMin <= minTask) {
+                            scheduleNotification(getNotification(judul, currentDateString + " " + waktu), rand, timeInMillis());
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override

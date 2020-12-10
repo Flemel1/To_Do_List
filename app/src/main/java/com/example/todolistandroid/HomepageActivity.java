@@ -59,6 +59,7 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
     List<Task> tasks;
     List<Task> deactiveTask;
     List<Task> searchTasks;
+    String taskMode = "active";
     private Intent myIntent;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
@@ -78,13 +79,12 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
         Glide.with(this).load(currentUser.getPhotoUrl()).into(mBinding.imgProfile);
         addItemToList();
         addTaskToList();
-        ArrayAdapter<CharSequence> adapterArray = ArrayAdapter.createFromResource(this,R.array.filter_array, android.R.layout.simple_spinner_item);
         mLinearLayoutManager = new LinearLayoutManager(HomepageActivity.this,
                 LinearLayoutManager.HORIZONTAL, false);
         mLinearLayoutManagerTask = new LinearLayoutManager(HomepageActivity.this,LinearLayoutManager.VERTICAL, false);
         mBinding.rcCatergory.setLayoutManager(mLinearLayoutManager);
         mBinding.rcTask.setLayoutManager(mLinearLayoutManagerTask);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.category_array, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.filter_array, android.R.layout.simple_spinner_item);
         //adapter.add("All");
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -133,13 +133,32 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
                 int position = viewHolder.getAdapterPosition();
                 switch(direction){
                     case ItemTouchHelper.LEFT:
-                        Log.d(TAG, "onSwiped() returned: " + tasks.get(position).getDocumentID());
-                        delete(tasks.get(position).getDocumentID(), tasks.get(position).getNotifID());
-                        tasks.remove(position);
-                        taskAdapter.notifyItemRemoved(position);
+                        if(taskMode.equals("active")){
+                            Log.d(TAG, "onSwiped() returned: " + tasks.get(position).getDocumentID());
+                            delete(tasks.get(position).getDocumentID(), tasks.get(position).getNotifID());
+                            tasks.remove(position);
+                            taskAdapter.notifyItemRemoved(position);
+                        }else if(taskMode.equals("deactive")){
+                            Log.d(TAG, "onSwiped() returned: " + deactiveTask.get(position).getDocumentID());
+                            delete(deactiveTask.get(position).getDocumentID(), deactiveTask.get(position).getNotifID());
+                            deactiveTask.remove(position);
+                            taskAdapter.notifyItemRemoved(position);
+                        }else if(taskMode.equals("search")){
+                            Log.d(TAG, "onSwiped() returned: " + searchTasks.get(position).getDocumentID());
+                            delete(searchTasks.get(position).getDocumentID(), searchTasks.get(position).getNotifID());
+                            searchTasks.remove(position);
+                            taskAdapter.notifyItemRemoved(position);
+                        }
+
                         break;
                     case ItemTouchHelper.RIGHT:
-                        addTask(1,tasks.get(position).getDocumentID());
+                        if(taskMode.equals("active")){
+                            addTask(1,tasks.get(position).getDocumentID());
+                        }else if(taskMode.equals("deactive")){
+                            addTask(1,deactiveTask.get(position).getDocumentID());
+                        }else if(taskMode.equals("search")){
+                            addTask(1,searchTasks.get(position).getDocumentID());
+                        }
                         break;
                 }
         }
@@ -237,6 +256,7 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
                                     Calendar taskCalendar = Calendar.getInstance();
                                     Date dateOfTask = new SimpleDateFormat("dd-MM-yyyy").parse(document.get("tanggal").toString());
                                     taskCalendar.setTime(dateOfTask);
+                                    Log.d(TAG, "Date: "+dateOfTask);
                                     int today = currentCalendar.get(Calendar.DAY_OF_MONTH);
                                     int currentMonth = currentCalendar.get(Calendar.MONTH);
                                     int dayTask = taskCalendar.get(Calendar.DAY_OF_MONTH);
@@ -263,12 +283,19 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
     //fungsi searching
     private void searchList(String search) {
         searchTasks = new ArrayList<>();
-        if (search.equals("")) {
-            taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
+        if (search.equals("") && currentFilter.equals("Semua")) {
+            if(taskMode.equals("active")){
+                taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
+            }else if(taskMode.equals("deactive")){
+                taskAdapter = new TaskAdapter(getApplicationContext(), deactiveTask);
+            }
             mBinding.rcTask.setAdapter(taskAdapter);
-        }
-        else {
-            for (Task task : tasks){
+        }else {
+            List<Task> temp = tasks;
+            if(taskMode.equals("deactive")){
+                temp = deactiveTask;
+            }
+            for (Task task : temp){
                 String dataSearch = task.getNamaTask().toLowerCase();
                 if(currentFilter.equals("Semua") || task.getKategori().equals(currentFilter)){
                     if(dataSearch.contains(search) || dataSearch.startsWith(search)) {
@@ -278,6 +305,7 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
             }
             taskAdapter = new TaskAdapter(getApplicationContext(), searchTasks);
             mBinding.rcTask.setAdapter(taskAdapter);
+            taskMode = "search";
         }
     }
 
@@ -348,10 +376,12 @@ public class HomepageActivity extends AppCompatActivity implements AdapterView.O
     public void onActiveTask(View view) {
         taskAdapter = new TaskAdapter(getApplicationContext(), tasks);
         mBinding.rcTask.setAdapter(taskAdapter);
+        taskMode = "active";
     }
 
     public void onDeactiveTask(View view) {
         taskAdapter = new TaskAdapter(getApplicationContext(), deactiveTask);
         mBinding.rcTask.setAdapter(taskAdapter);
+        taskMode = "deactive";
     }
 }
